@@ -1,6 +1,6 @@
 import os, sqlite3, subprocess, json, tempfile, re, math
 from pathlib import Path
-from flask import Flask, request, redirect, url_for, render_template_string
+from flask import Flask, request, redirect, url_for, render_template_string, send_file
 from werkzeug.utils import secure_filename
 
 DB=os.getenv("CONSULTBAE_DB","consultbae.db")
@@ -15,7 +15,7 @@ HTML="""<!doctype html><title>ConsultBae Audio Collector</title>
 <button>Submit</button></form>
 <hr><h2>Submissions</h2>
 {% for x in rows %}<div style="margin:16px 0"><b>{{x[1]}}</b> — {{x[2]}}
-<audio controls src="/audio/{{x[4]}}"></audio>
+<audio controls preload="metadata" src="{{ url_for('audio', name=x[4]) }}"></audio>
 <pre>duration={{x[5]}}s | sample_rate={{x[6]}} kHz | bitrate={{x[7]}} kbps | loudness={{x[8]}} dB | quality={{x[9]}}</pre></div>{% endfor %}"""
 
 def ffprobe(path):
@@ -70,7 +70,15 @@ def home():
 
 @app.get("/audio/<path:name>")
 def audio(name):
-    from flask import send_from_directory
-    return send_from_directory(AUDIO_DIR,name)
+    file_path = AUDIO_DIR / name
+
+    if not file_path.exists():
+        return "Audio file not found", 404
+
+    return send_file(
+        file_path,
+        mimetype="audio/mpeg",
+        as_attachment=False
+    )
 
 if __name__=="__main__": app.run(host="0.0.0.0",port=8501)
