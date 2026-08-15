@@ -1,165 +1,410 @@
-# ConsultBae — AI Automation Take-Home
+ConsultBae — AI Automation Take-Home Assignment
 
-A working submission for the five-part assignment: messy CSV merge, one n8n automation, an audio collection app, a data-quality report, and a scale-up note.
+Overview
 
-## What is included
+This repository contains my solution for the ConsultBae AI Automation Take-Home Assignment.
 
-- `scripts/db.py` — ingests all 3 CSVs into SQLite and performs deterministic entity resolution.
-- `consultbae.db` — generated SQLite database.
-- `scripts/api.py` — tiny API used by the n8n workflow to check a person against the merged database.
-- `app/audio_app.py` — upload-based audio collection web app. Browser recording is not required by the brief; upload is sufficient.
-- `n8n/duplicate_alert.json` — importable n8n workflow: CSV webhook → CSV parsing → duplicate check → alert.
-- `DATA_ISSUES.md` — specific issues found and handling decisions.
-- `STUCK_LOG.md` — realistic decision/debug log.
-- `SCALE_NOTE.md` — optional 5,000-worker weekend launch plan.
+The solution covers the three main implementation tasks:
 
-The assignment explicitly prioritizes working software, sensible matching, data issues caught, and the ability to explain decisions. fileciteturn0file0L14-L27
+Consolidating three inconsistent CSV data sources into a clean SQLite database.
 
-## Quick start
+Building a working n8n Cloud automation for CSV duplicate detection.
 
-### 1. Install
+Building a miniature gig-worker audio collection application that stores audio and automatically extracts audio metadata.
 
-Python 3.10+ is recommended.
+It also includes the required data-quality report, stuck log, and scalability note.
 
-```bash
-python -m venv .venv
-# Windows:
-.venv\Scripts\activate
-# macOS/Linux:
-# source .venv/bin/activate
+Project Structure
+
+consultbae_assignment/
+│
+├── app/
+│   └── audio_app.py
+│
+├── data/
+│   ├── source1_naukri_applicants(1).csv
+│   ├── source2_gig_workers(1).csv
+│   └── source3_cbnexus_contacts(1).csv
+│
+├── n8n/
+│   └── duplicate_alert.json
+│
+├── scripts/
+│   ├── api.py
+│   └── db.py
+│
+├── storage/
+│   └── audio/
+│
+├── consultbae.db
+├── DATA_ISSUES.md
+├── SCALE_NOTE.md
+├── STUCK_LOG.md
+├── requirements.txt
+└── README.md
+
+Task 1 — Data Merge and Master Database
+
+Objective
+
+The three supplied CSV files came from different systems and contained overlapping people, inconsistent formatting, and data-quality problems.
+
+The goal was to ingest the three sources into one clean SQLite database and ensure that the same person appearing in multiple sources becomes one master person record.
+
+Approach
+
+The ingestion pipeline is implemented in:
+
+scripts/db.py
+
+The pipeline:
+
+Reads all three CSV files.
+
+Cleans and normalizes fields.
+
+Preserves source-record information.
+
+Attempts conservative identity matching.
+
+Creates a consolidated master-person record.
+
+Stores source provenance separately.
+
+The matching logic prioritizes strong identifiers such as normalized email and phone. Name/city information is used conservatively as supporting evidence rather than blindly merging records based only on a name.
+
+Result
+
+The final ingestion produced:
+
+103 valid source records
+        ↓
+55 master people
+
+The SQLite database is:
+
+consultbae.db
+
+Main Database Tables
+
+persons
+
+Contains the consolidated master people.
+
+source_records
+
+Preserves source-level records and provenance.
+
+audio_submissions
+
+Stores records created by the audio collection application.
+
+Task 2 — n8n Duplicate Detection Automation
+
+Objective
+
+The assignment requires one working low-code/no-code automation.
+
+I implemented the duplicate-detection option using n8n Cloud.
+
+Workflow
+
+Incoming CSV
+     ↓
+Receive CSV — Webhook
+     ↓
+Extract CSV
+     ↓
+Check Against Master DB
+     ↓
+Is Duplicate?
+    ↙       ↘
+  YES       NO
+   ↓         ↓
+Build      New Person
+Alert      Result
+   ↓
+Respond to Webhook
+
+What the workflow does
+
+Receives a CSV through an n8n webhook.
+
+Extracts the CSV into individual records.
+
+Normalizes incoming identity fields.
+
+Checks each incoming person against the consolidated master dataset.
+
+Routes duplicate records through the duplicate branch.
+
+Returns a duplicate response through the webhook.
+
+The workflow was tested successfully in n8n Cloud using the supplied CSV data.
+
+n8n Export
+
+The workflow export is stored in:
+
+n8n/duplicate_alert.json
+
+Task 3 — Mini Gig-Worker Audio Collection App
+
+Objective
+
+The application provides a simple interface where a worker can:
+
+Enter their name.
+
+Enter their phone number.
+
+Upload an audio recording.
+
+Submit the recording.
+
+View previous submissions.
+
+Play submitted recordings.
+
+Audio Metadata
+
+For every submitted audio file, the application extracts and stores:
+
+Duration
+
+Sample rate
+
+Bitrate
+
+Loudness
+
+Rough quality estimate
+
+The application uses FFmpeg/FFprobe for audio analysis.
+
+Example Successful Submission
+
+One test submission produced:
+
+Duration:      195.744 seconds
+Sample rate:   44.1 kHz
+Bitrate:       127.623 kbps
+Loudness:      -11.5 dB
+Quality:       99.93
+
+The submission was successfully stored and displayed with an audio player.
+
+Run the Application
+
+Install dependencies:
 
 pip install -r requirements.txt
-```
 
-`ffmpeg` and `ffprobe` must also be available on PATH for audio metadata extraction.
+Make sure FFmpeg/FFprobe is installed and available on PATH.
 
-### 2. Build the merged database
+Run:
 
-```bash
+python app/audio_app.py
+
+Then open the local URL shown by the application.
+
+Task 4 — Data Quality Issues
+
+A separate report documents the data-quality problems found while working with the three source files and explains how they were handled.
+
+See:
+
+DATA_ISSUES.md
+
+The focus was not only on cleaning data, but also on documenting potentially unsafe or ambiguous cases instead of silently making assumptions.
+
+Task 5 — Scalability Note
+
+The scalability analysis considers what could fail first if the application were launched to 5,000 gig workers over one weekend.
+
+Topics covered include:
+
+Concurrent uploads
+
+Storage growth
+
+Large audio files
+
+Upload failures
+
+Duplicate submissions
+
+Database contention
+
+Processing bottlenecks
+
+Retry handling
+
+Cost considerations
+
+Object storage
+
+Background processing
+
+See:
+
+SCALE_NOTE.md
+
+Setup
+
+1. Clone the repository
+
+git clone https://github.com/manipalsanyam/consultbae-ai-automation.git
+cd consultbae-ai-automation
+
+2. Create a virtual environment
+
+Windows:
+
+python -m venv .venv
+.venv\Scripts\activate
+
+macOS/Linux:
+
+python3 -m venv .venv
+source .venv/bin/activate
+
+3. Install dependencies
+
+pip install -r requirements.txt
+
+4. Build/refresh the database
+
 python scripts/db.py
-```
 
-Expected result with the supplied files:
+Expected result:
 
-```text
-Ingested 103 valid source rows into 55 master people.
-```
+103 valid source rows
+55 master people
 
-The ingestion:
-1. normalizes email, phone, name and city;
-2. removes obvious non-data rows;
-3. links exact normalized email or phone first;
-4. uses exact normalized name + normalized city only when that match is unambiguous within each source;
-5. preserves every source row in `source_records` instead of deleting evidence;
-6. stores a canonical person in `persons`.
+5. Run the audio application
 
-This avoids using fuzzy name similarity as the final merge key, which would incorrectly merge people such as Isha Chopra/Sneha Chopra or two Arjun Mehta records.
+python app/audio_app.py
 
-### 3. Run the duplicate-check API
+Running the API
 
-Terminal 1:
+The repository also contains:
 
-```bash
+scripts/api.py
+
+It provides the local API used during development/testing for database-related checks.
+
+Run:
+
 python scripts/api.py
-```
 
 Health check:
 
-```bash
-curl http://localhost:8000/health
-```
+http://127.0.0.1:8000/health
 
-Test:
+n8n Setup
 
-```bash
-curl -X POST http://localhost:8000/duplicate-check ^
-  -H "Content-Type: application/json" ^
-  -d "{\"name\":\"Tanvi Gupta\",\"email\":\"tanvi.gupta31@example.com\",\"phone\":\"9000000254\"}"
-```
+The n8n workflow is exported in:
 
-### 4. Run the audio app
+n8n/duplicate_alert.json
 
-Terminal 2:
+Import the JSON into n8n.
 
-```bash
-python app/audio_app.py
-```
+The current demonstrated workflow uses the n8n Cloud webhook and the duplicate-checking logic contained in the exported workflow.
 
-Open `http://localhost:8501`.
+For testing, use the webhook's Test URL while the webhook is listening for a test event.
 
-Enter name + phone, upload an audio file, and submit. The app stores:
-- duration in seconds
-- sample rate in kHz
-- bitrate in kbps
-- loudness as an approximate dBFS/RMS proxy
-- a simple quality score
+Example request:
 
-The assignment asks for these four extracted properties and a second listing view with playback. fileciteturn0file0L28-L39
+curl.exe -X POST -F "data=@data/source1_naukri_applicants(1).csv" "YOUR_N8N_TEST_WEBHOOK_URL"
 
-### 5. n8n automation
+Key Design Decisions
 
-Use a self-hosted n8n instance. Import:
+Conservative entity matching
 
-`n8n/duplicate_alert.json`
+A wrong merge can be more damaging than leaving two possible records separate. Therefore, strong identifiers were prioritized and ambiguous matches were treated conservatively.
 
-Flow:
+Preserve source provenance
 
-**Webhook (CSV upload) → Spreadsheet File parser → Split Rows → HTTP duplicate check → IF duplicate → Email alert**
+Instead of destroying the original source records during cleaning, source-level records are retained separately. This makes the master record explainable and makes debugging easier.
 
-The assignment requires one working no-code/low-code automation and an exported flow JSON. fileciteturn0file0L18-L27
+Simple working audio application
 
-Before testing:
-- change the duplicate-check URL if n8n is not running in Docker;
-- set a real alert email;
-- configure SMTP credentials;
-- make sure the API is reachable from the n8n container (`host.docker.internal` works in Docker Desktop; on Linux use the host gateway or a shared Docker network).
+The assignment prioritizes working software over visual polish. The audio application therefore focuses on the required workflow and metadata extraction rather than a complex UI.
 
-### 6. GitHub
+Low-code automation
 
-```bash
-git init
-git add .
-git commit -m "feat: initial ConsultBae assignment solution"
-git add .
-git commit -m "feat: add data quality report and automation"
-git add .
-git commit -m "feat: add audio collection app"
-```
+The n8n workflow was kept visible and easy to explain because the assignment specifically evaluates the ability to use low-code automation rather than solving Task 2 only with Python.
 
-Push to a private/public repo as requested by the recruiter. The assignment specifically says they inspect commit history. fileciteturn0file0L46-L55
+Testing Performed
 
-## 6-minute demo script
+The following were tested during development:
 
-1. **0:00–0:45 — Merge**
-   - Run `python scripts/db.py`.
-   - Show the `55 master people` result.
-   - Explain exact email/phone first, then conservative name+city matching.
+CSV ingestion
 
-2. **0:45–2:00 — Data quality**
-   - Open `DATA_ISSUES.md`.
-   - Point out duplicate rows, malformed row, header row, mixed formats, future dates, unit inconsistencies and conflicting identifiers.
+Master database creation
 
-3. **2:00–3:15 — n8n**
-   - Show imported workflow.
-   - POST a CSV through the webhook.
-   - Show duplicate branch and alert.
+Consolidation of 103 source records into 55 people
 
-4. **3:15–5:15 — Audio**
-   - Open app.
-   - Enter a known person.
-   - Upload a short `.wav`/`.mp3`.
-   - Submit.
-   - Show duration, sample rate, bitrate, loudness, quality and playback.
+Local API health check
 
-5. **5:15–6:00 — Hard decisions**
-   - Explain why fuzzy names were not used as an automatic merge key.
-   - Explain the duplicate/ambiguous records and how source evidence is retained.
-   - Mention what you would change for 5,000 workers.
+Audio upload
 
-The assignment says voice is required in the screen recording but face is not. fileciteturn0file0L53-L54
+Audio metadata extraction
 
-## Important honesty note
+Audio playback
 
-Do not claim the n8n workflow is cloud-hosted or that an external deployment exists if you only demonstrate it locally. The assignment accepts local execution in the video. fileciteturn0file0L37-L39
+n8n webhook reception
 
-Also be able to explain every line: the assignment explicitly says shortlisted candidates may extend the solution live. fileciteturn0file0L56-L59
+CSV extraction in n8n
+
+Duplicate matching branch
+
+Duplicate response through the webhook
+
+Known Limitations
+
+This is a take-home assignment implementation rather than a production deployment.
+
+Potential production improvements include:
+
+PostgreSQL instead of SQLite
+
+Object storage for audio
+
+Background audio processing
+
+Authentication and authorization
+
+Rate limiting
+
+Better duplicate-resolution workflows
+
+Structured logging and monitoring
+
+Retry queues
+
+Automated tests
+
+Cloud deployment
+
+Better handling of concurrent uploads
+
+Stuck Log
+
+The detailed development/stuck log is available separately:
+
+STUCK_LOG.md
+
+It records the main places where I got stuck, what I searched or asked AI about, which approaches were tried, and why some approaches were rejected.
+
+Submission
+
+GitHub:
+
+https://github.com/manipalsanyam/consultbae-ai-automation
+
+Demo video:
+
+ADD VIDEO LINK HERE
+
