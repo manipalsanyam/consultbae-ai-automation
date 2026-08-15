@@ -1,0 +1,202 @@
+{
+  "name": "ConsultBae - Cloud Duplicate Alert",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "consultbae-csv-cloud",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "ac8c5dcb-1f02-4a8d-971f-c259e2951b3c",
+      "name": "Receive CSV",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1088,
+        128
+      ],
+      "webhookId": "consultbae-csv-cloud"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "da844589-07a3-4975-82a4-6712622cb992",
+      "name": "Extract CSV",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -832,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const master = [{\"person_id\":\"CB-0001\",\"name\":\"Tanvi Gupta\",\"email\":\"tanvi.gupta31@example.com\",\"phone\":\"9000000254\",\"city\":\"Bengaluru\"},{\"person_id\":\"CB-0002\",\"name\":\"Manish Reddy\",\"email\":\"manish.reddy73@example.com\",\"phone\":\"9000000237\",\"city\":\"GURGAON\"},{\"person_id\":\"CB-0003\",\"name\":\"Priya Singh\",\"email\":\"priya.singh61@mailtest.example.org\",\"phone\":\"9000000287\",\"city\":\"GURGAON\"},{\"person_id\":\"CB-0004\",\"name\":\"Vikram Saxena\",\"email\":\"vikram.saxena60@example.com\",\"phone\":\"9000000113\",\"city\":\"GURGAON\"},{\"person_id\":\"CB-0005\",\"name\":\"Amit Agarwal\",\"email\":\"amit.agarwal3@mailtest.example.org\",\"phone\":\"9000000288\",\"city\":\"pune\"},{\"person_id\":\"CB-0006\",\"name\":\"Sahil Malhotra\",\"email\":\"sahil.malhotra1@example.in\",\"phone\":\"9000000143\",\"city\":\"Noida\"},{\"person_id\":\"CB-0007\",\"name\":\"Shreya Gupta\",\"email\":\"shreya.gupta85@example.com\",\"phone\":\"9000000227\",\"city\":\"NOIDA\"},{\"person_id\":\"CB-0008\",\"name\":\"Isha Chopra\",\"email\":\"isha.chopra95@mailtest.example.org\",\"phone\":\"9000000138\",\"city\":\"PUNE\"},{\"person_id\":\"CB-0009\",\"name\":\"Priya Nair\",\"email\":\"priya.nair70@example.com\",\"phone\":\"9000000222\",\"city\":\"gurugram \"},{\"person_id\":\"CB-0010\",\"name\":\"Rohit Mishra\",\"email\":\"rohit.mishra70@mailtest.example.org\",\"phone\":\"9000000167\",\"city\":\"Delhi\"},{\"person_id\":\"CB-0011\",\"name\":\"Rahul Malhotra\",\"email\":\"rahul.malhotra69@mailtest.example.org\",\"phone\":\"9000000260\",\"city\":\"new delhi\"},{\"person_id\":\"CB-0012\",\"name\":\"Rahul Jain\",\"email\":\"rahul.jain34@example.in\",\"phone\":\"9000000114\",\"city\":\"Noida \"},{\"person_id\":\"CB-0013\",\"name\":\"Nikhil Malhotra\",\"email\":\"nikhil.malhotra41@example.in\",\"phone\":\"9000000145\",\"city\":\"New Delhi\"},{\"person_id\":\"CB-0014\",\"name\":\"Karan Bhatia\",\"email\":\"karan.bhatia32@mailtest.example.org\",\"phone\":\"9000000211\",\"city\":\"Noida \"},{\"person_id\":\"CB-0015\",\"name\":\"Ritu Sharma\",\"email\":\"ritu.sharma23@mailtest.example.org\",\"phone\":\"9000000146\",\"city\":\"Noida \"},{\"person_id\":\"CB-0016\",\"name\":\"Arjun Mishra\",\"email\":\"arjun.mishra70@example.com\",\"phone\":\"9000000106\",\"city\":\"Delhi\"},{\"person_id\":\"CB-0017\",\"name\":\"Meera Bhatia\",\"email\":\"meera.bhatia52@mailtest.example.org\",\"phone\":\"9000000223\",\"city\":\"Delhi NCR\"},{\"person_id\":\"CB-0018\",\"name\":\"Varun Jain\",\"email\":\"varun.jain29@example.com\",\"phone\":\"9000000263\",\"city\":\"Pune\"},{\"person_id\":\"CB-0019\",\"name\":\"Arjun Mehta\",\"email\":\"arjun.mehta9@example.in\",\"phone\":\"9000000131\",\"city\":\"NOIDA\"},{\"person_id\":\"CB-0020\",\"name\":\"Kavya Mehta\",\"email\":\"kavya.mehta7@example.com\",\"phone\":\"9000000177\",\"city\":\"Bengaluru\"},{\"person_id\":\"CB-0021\",\"name\":\"Sneha Chopra\",\"email\":\"sneha.chopra99@example.in\",\"phone\":\"9000000162\",\"city\":\"pune\"},{\"person_id\":\"CB-0022\",\"name\":\"Deepak Mehta\",\"email\":\"deepak.mehta86@example.in\",\"phone\":\"9000000116\",\"city\":\"NOIDA\"},{\"person_id\":\"CB-0023\",\"name\":\"Pooja Gupta\",\"email\":\"pooja.gupta57@mailtest.example.org\",\"phone\":\"9000000271\",\"city\":\"Noida\"},{\"person_id\":\"CB-0024\",\"name\":\"R. Verma\",\"email\":\"rohit.verma13@mailtest.example.org\",\"phone\":\"9000000294\",\"city\":\"Bangalore\"},{\"person_id\":\"CB-0025\",\"name\":\"Sneha Mishra\",\"email\":\"sneha.mishra14@mailtest.example.org\",\"phone\":\"9000000229\",\"city\":\"pune\"},{\"person_id\":\"CB-0026\",\"name\":\"Nikhil Chopra\",\"email\":\"alt.nikhil.chopra70@example.com\",\"phone\":\"9000000103\",\"city\":\"NOIDA\"},{\"person_id\":\"CB-0027\",\"name\":\"Priya Saxena\",\"email\":\"priya.saxena61@example.com\",\"phone\":\"9000000231\",\"city\":\"Delhi\"},{\"person_id\":\"CB-0028\",\"name\":\"Varun Saxena\",\"email\":\"varun.saxena21@example.in\",\"phone\":\"9000000170\",\"city\":\"gurugram \"},{\"person_id\":\"CB-0029\",\"name\":\"Gaurav Mehta\",\"email\":\"gaurav.mehta79@mailtest.example.org\",\"phone\":\"9000000133\",\"city\":\"Bengaluru\"},{\"person_id\":\"CB-0030\",\"name\":\"Rohit Nair\",\"email\":\"rohit.nair32@mailtest.example.org\",\"phone\":\"9000000268\",\"city\":\"Gurugram\"},{\"person_id\":\"CB-0031\",\"name\":\"Deepak Nair\",\"email\":\"deepak.nair44@example.com\",\"phone\":\"9000000296\",\"city\":\"bangalore\"},{\"person_id\":\"CB-0032\",\"name\":\"Rahul Chopra\",\"email\":\"rahul.chopra70@example.com\",\"phone\":\"9000000137\",\"city\":\"NOIDA\"},{\"person_id\":\"CB-0033\",\"name\":\"Deepak Singh\",\"email\":\"deepak.singh36@mailtest.example.org\",\"phone\":\"9000000202\",\"city\":\"bangalore\"},{\"person_id\":\"CB-0034\",\"name\":\"Amit Reddy\",\"email\":\"amit.reddy9@mailtest.example.org\",\"phone\":\"9000000165\",\"city\":\"Delhi NCR\"},{\"person_id\":\"CB-0035\",\"name\":\"Tanvi Agarwal\",\"email\":\"tanvi.agarwal97@example.in\",\"phone\":\"9000000148\",\"city\":\"PUNE\"},{\"person_id\":\"CB-0036\",\"name\":\"Nikhil Mehta\",\"email\":\"nikhil.mehta5@example.com\",\"phone\":\"9000000104\",\"city\":\"PUNE\"},{\"person_id\":\"CB-0037\",\"name\":\"Isha Kapoor\",\"email\":\"isha.kapoor54@example.com\",\"phone\":\"9000000295\",\"city\":\"new delhi\"},{\"person_id\":\"CB-0038\",\"name\":\"Arjun Bhatia\",\"email\":\"arjun.bhatia14@example.com\",\"phone\":\"9000000212\",\"city\":\"new delhi\"},{\"person_id\":\"CB-0039\",\"name\":\"Isha Sharma\",\"email\":\"isha.sharma15@example.com\",\"phone\":\"9000000259\",\"city\":\"Delhi\"},{\"person_id\":\"CB-0040\",\"name\":\"Neha Bhatia\",\"email\":\"neha.bhatia60@mailtest.example.org\",\"phone\":\"9000000273\",\"city\":\"Pune\"},{\"person_id\":\"CB-0041\",\"name\":\"Arjun Mehta\",\"email\":\"arjun.mehta77@mailtest.example.org\",\"phone\":\"9000000272\",\"city\":\"Noida\"},{\"person_id\":\"CB-0042\",\"name\":\"MANISH BHATIA\",\"email\":\"manish.bhatia3@example.com\",\"phone\":\"9000000161\",\"city\":\"Noida \"},{\"person_id\":\"CB-0043\",\"name\":\"DIVYA CHOPRA\",\"email\":\"divya.chopra59@example.in\",\"phone\":\"9000000111\",\"city\":\"NOIDA\"},{\"person_id\":\"CB-0044\",\"name\":\"Karan Chopra\",\"email\":\"KARAN.CHOPRA76@MAILTEST.EXAMPLE.ORG\",\"phone\":\"9000000245\",\"city\":\"pune\"},{\"person_id\":\"CB-0045\",\"name\":\"Vikram Mehta\",\"email\":\"vikram.mehta6@example.com\",\"phone\":\"9000000261\",\"city\":\"PUNE\"},{\"person_id\":\"CB-0046\",\"name\":\"Pooja Kapoor\",\"email\":\"pooja.kapoor62@example.in\",\"phone\":\"\",\"city\":\"NOIDA\"},{\"person_id\":\"CB-0047\",\"name\":\"Kavya Verma\",\"email\":\"KAVYA.VERMA74@MAILTEST.EXAMPLE.ORG\",\"phone\":\"\",\"city\":\"gurugram \"},{\"person_id\":\"CB-0048\",\"name\":\"Tanvi Reddy\",\"email\":\"TANVI.REDDY80@EXAMPLE.COM\",\"phone\":\"\",\"city\":\"pune\"},{\"person_id\":\"CB-0049\",\"name\":\"Varun Singh\",\"email\":\"varun.singh81@example.com\",\"phone\":\"\",\"city\":\"Noida \"},{\"person_id\":\"CB-0050\",\"name\":\"Tanvi Kapoor\",\"email\":\"tanvi.kapoor38@example.com\",\"phone\":\"\",\"city\":\"new delhi\"},{\"person_id\":\"CB-0051\",\"name\":\"Nikhil Nair\",\"email\":\"nikhil.nair26@example.in\",\"phone\":\"\",\"city\":\"gurugram \"},{\"person_id\":\"CB-0052\",\"name\":\"Pooja Reddy\",\"email\":\"pooja.reddy96@mailtest.example.org\",\"phone\":\"\",\"city\":\"Noida\"},{\"person_id\":\"CB-0053\",\"name\":\"Tanvi Sharma\",\"email\":\"TANVI.SHARMA56@MAILTEST.EXAMPLE.ORG\",\"phone\":\"\",\"city\":\"NOIDA\"},{\"person_id\":\"CB-0054\",\"name\":\"Deepak Nair\",\"email\":\"DEEPAK.NAIR57@EXAMPLE.IN\",\"phone\":\"\",\"city\":\"New Delhi\"},{\"person_id\":\"CB-0055\",\"name\":\"Anjali Agarwal\",\"email\":\"anjali.agarwal53@mailtest.example.org\",\"phone\":\"\",\"city\":\"Bengaluru\"}];\n\nfunction normText(v) {\n  return String(v ?? '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');\n}\nfunction normEmail(v) {\n  return String(v ?? '').trim().toLowerCase();\n}\nfunction normPhone(v) {\n  const d = String(v ?? '').replace(/\\D/g, '');\n  return d.length >= 10 ? d.slice(-10) : d;\n}\nfunction normCity(v) {\n  const s = String(v ?? '').trim().toLowerCase();\n  return ({'gurugram':'gurgaon','new delhi':'delhi','delhi ncr':'delhi',\n            'bangalore':'bengaluru','bengaluru':'bengaluru'})[s] || s;\n}\n\nreturn $input.all().map(item => {\n  const r = item.json || {};\n  const name = r.name ?? r.Name ?? r['Full Name'] ?? r['worker_name'] ?? '';\n  const email = r.email ?? r.Email ?? r.email_id ?? '';\n  const phone = r.phone ?? r.Phone ?? r['Phone Number'] ?? '';\n  const city = r.city ?? r.City ?? r.location ?? '';\n\n  const ne = normEmail(email);\n  const np = normPhone(phone);\n  const nn = normText(name);\n  const nc = normCity(city);\n\n  const matches = master.filter(p =>\n    (ne && p.email && ne === normEmail(p.email)) ||\n    (np && p.phone && np === normPhone(p.phone)) ||\n    (nn && nc && nn === normText(p.name) && nc === normCity(p.city))\n  );\n\n  return {\n    json: {\n      ...r,\n      name, email, phone, city,\n      duplicate: matches.length > 0,\n      matched_person: matches[0] || null,\n      match_type: matches.length ? (\n        ne && matches.some(p => ne === normEmail(p.email)) ? 'email' :\n        np && matches.some(p => np === normPhone(p.phone)) ? 'phone' : 'name+city'\n      ) : 'none'\n    }\n  };\n});"
+      },
+      "id": "e6c2a66e-880b-4bb0-a5d9-abbe6150a266",
+      "name": "Check Against Master DB",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -528,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "dup",
+              "leftValue": "={{ $json.duplicate }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "1af8961a-071e-440a-bbdb-454c021234ca",
+      "name": "Is Duplicate?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -256,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{json:{alert:'DUPLICATE DETECTED',name:$json.name,email:$json.email,phone:$json.phone,match_type:$json.match_type,matched_person:$json.matched_person}}];"
+      },
+      "id": "4e43a945-cf82-4359-8453-20d6bc3aaa02",
+      "name": "Build Duplicate Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{json:{status:'new_person',name:$json.name,email:$json.email,phone:$json.phone,match_type:$json.match_type}}];"
+      },
+      "id": "a3a21c9f-a130-41a3-bfda-891e8fd3faf3",
+      "name": "New Person Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {\n  \"status\": \"DUPLICATE DETECTED\",\n  \"name\": $json.name,\n  \"email\": $json.email,\n  \"phone\": $json.phone,\n  \"match_type\": $json.match_type,\n  \"matched_person\": $json.matched_person\n} }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "48377ff4-aa1a-4c1f-b430-0adebeec0e08",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Receive CSV": {
+      "main": [
+        [
+          {
+            "node": "Extract CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract CSV": {
+      "main": [
+        [
+          {
+            "node": "Check Against Master DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Against Master DB": {
+      "main": [
+        [
+          {
+            "node": "Is Duplicate?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Duplicate?": {
+      "main": [
+        [
+          {
+            "node": "Build Duplicate Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "New Person Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Duplicate Alert": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "92814f02-4fee-4466-9aa8-b5f632aca372",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "352f6cd1606b3953a4874e7af5404449d32416e66845810582d3d3cc76ba5be1"
+  },
+  "nodeGroups": [],
+  "id": "gwPhXA4z6E1iox4V",
+  "tags": []
+}
