@@ -1,0 +1,174 @@
+{
+  "name": "ConsultBae - CSV Duplicate Alert",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "consultbae-csv",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "1",
+      "name": "Receive CSV",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "consultbae-csv"
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "binaryPropertyName": "data",
+        "options": {
+          "headerRow": 0
+        }
+      },
+      "id": "2",
+      "name": "Parse CSV",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "id": "3",
+      "name": "Split Rows",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/duplicate-check",
+        "sendBody": true,
+        "contentType": "json",
+        "jsonBody": "={\"name\": $json[\"Full Name\"] || $json[\"worker_name\"] || $json[\"Name\"], \"email\": $json[\"Email\"] || $json[\"email_id\"], \"phone\": $json[\"Phone\"] || $json[\"Phone Number\"]}",
+        "options": {}
+      },
+      "id": "4",
+      "name": "Check Database",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        680,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.duplicate}}",
+              "operation": "isTrue"
+            }
+          ]
+        }
+      },
+      "id": "5",
+      "name": "Is Duplicate?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        900,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "consultbae-bot@example.com",
+        "toEmail": "your-email@example.com",
+        "subject": "ConsultBae duplicate detected",
+        "text": "A duplicate person was detected by the CSV intake workflow.\n\nMatches: {{$json.matches}}"
+      },
+      "id": "6",
+      "name": "Send Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1120,
+        -80
+      ]
+    }
+  ],
+  "connections": {
+    "Receive CSV": {
+      "main": [
+        [
+          {
+            "node": "Parse CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse CSV": {
+      "main": [
+        [
+          {
+            "node": "Split Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Rows": {
+      "main": [
+        [
+          {
+            "node": "Check Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Database": {
+      "main": [
+        [
+          {
+            "node": "Is Duplicate?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Duplicate?": {
+      "main": [
+        [
+          {
+            "node": "Send Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "consultbae-demo",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}
